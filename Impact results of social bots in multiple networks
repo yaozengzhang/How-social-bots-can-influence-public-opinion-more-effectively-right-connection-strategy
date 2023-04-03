@@ -1,0 +1,239 @@
+%% 集成社交机器人和一般个体
+pjOalloo=[];
+sixcuculate=[];
+for qq=1:6%%六个网络切换
+    if qq==1
+        BAnetwork=BAcarrier1;
+    end
+    if qq==2
+        BAnetwork=BAcarrier2;
+    end
+    if qq==3
+        BAnetwork=BAcarrier3;
+    end
+    if qq==4
+        BAnetwork=BAcarrier4;
+    end
+    if qq==5
+        BAnetwork=BAcarrier5;
+    end
+    if qq==6
+        BAnetwork=BAcarrier6;
+    end
+    pjOalloo=[];
+    
+    for pjun=1:10
+        Oalloo=[];
+        
+        for t=0:30
+            %% 初始化 舆论网络和一般个体
+            Carriernetwork=BAnetwork;%%导入网络
+            leng=length(Carriernetwork);%%计算节点规模
+            nameda=ones(leng,1);%初始化个体活跃度
+            corpus=1001*ones(leng,500);%初始化语句库
+            chushipl=randi([1,1000],1000,100);%初始化个体对事件的评论
+            corpus(1:1000,1:100)=chushipl;%初始化个体对事件的评论
+            opinionclimate=zeros(leng,1);%初始化舆论环境
+            Iit=zeros(leng,1);%初始化舆论环境影响impact of opinion climate
+            agreesum=sum(corpus<501,2);%计算持有支持态度的观点评论数量
+            Oall=agreesum./sum(corpus<=1000,2);%初始计算每个体所持有的观点评论数量然后进行每个体的支持率计算
+            for i=1:leng %计算所有个体的舆论环境
+                Carriernetwork(i,i)=0;%抹去矩阵中ii元素
+            end
+            %% 初始化社交机器人配置
+            N=50;%每个社交机器人部署数量N个
+            R=50;%构建社交机器人建立通信连接R条
+            hol=0+0.01*t;%设置观点与预设值的容忍度
+            rubots=zeros(R,N);% 构建社交机器人部署数量N个 %每个社交机器人建立通信连接R条
+            U=(Carriernetwork);%
+            U=sum(U);
+            [B,index]=sort(U,'descend');%对网络中的度进行排序 index是从大到小的节点序号
+            comindex=index;
+            comindexx=[comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex comindex];
+            Rcom=index(1:R);%每个社交机器人建立通信连接N条
+            for i=1:N
+                rubots(:,i)=Rcom';%每个社交机器人建立通信连接N条
+            end
+            RBcorpus=1001*ones(N,500);%构建社交机器人语料库
+            chushipl=repmat([1:100],N,1);%初始化社交机器人对事件的评论
+            RBcorpus(1:N,1:100)=chushipl;%初始化社交机器人语言库语句
+            agreesum=sum(RBcorpus<501,2);
+            RBOall=agreesum./sum(RBcorpus<=1000,2);%初始化社交机器人的观点值
+            RBnameda=50*ones(N,1);%初始化个体活跃度%初始化社交机器人活跃度
+            RBIit=zeros(leng,1);%初始化舆论环境影响impact of opinion climate
+            jihuoRB=zeros(N,1);%初始化激活节点统计
+            RBlianjieshuliang=N*ones(N,1);%初始化社交机器人已连接过的节点数量
+            for T=1:500
+                %% 社交机器人并入前准备
+                %% 探查社交机器人舆论环境与预设值大小差异
+                for i=1:N
+                    RBcom=rubots(:,i);%取出第i个社交机器人的邻居节点编号
+                    chazhi=sum(RBOall(i)-Oall(RBcom))/length(RBcom);%计算邻居节点观点与预设值差值大小
+                    RBIit(i)=chazhi;
+                end
+                
+                %% 判断社交机器人是否激活
+                for i=1:N
+                    nemda=RBIit(i);
+                    sigmoid=1/(1+exp(-nemda));%观点差值输入到sigmoid函数
+                    if rand(1)<sigmoid
+                        jihuoRB(i)=1;%则激活
+                    else
+                        jihuoRB(i)=0;%静默
+                    end
+                end
+                jihuoRBorder=find(jihuoRB~=0);%形成激活的社交机器人编号
+                
+                %% 并入社交机器人
+                %并入初始化网络
+                RBsl=length(jihuoRBorder);%社交机器人激活的数量
+                bingruwl=zeros(leng,RBsl);%生成并入矩阵
+                for i=1:RBsl
+                    brl=bingruwl(:,i);%提取第i个社交机器人并入矩阵的列
+                    brl(rubots(:,i))=1;%建立与邻居节点的连接列
+                    Carriernetwork=[Carriernetwork brl];%并入网络!!!
+                end
+                duichen=(Carriernetwork(:,leng+1:leng+RBsl))';
+                duichen=[duichen zeros(RBsl)];
+                Carriernetwork= [Carriernetwork;duichen];%矩阵对称处理
+                %并入社交机器人语料库
+                for i=1:RBsl
+                    ylRB=jihuoRBorder(i);%第i个被激活的社交机器人编号
+                    textRB=RBcorpus(ylRB,:);%提取激活的社交机器人语料库
+                    corpus=[corpus;textRB];%并入语料库!!!
+                end
+                %并入社交机器人活跃度
+                for i=1:RBsl
+                    ylRB=jihuoRBorder(i);%第i个被激活的社交机器人编号
+                    nemdRB=RBnameda(ylRB);%提取激活的社交机器人活跃度
+                    nameda=[nameda;nemdRB];%并入活跃度!!!
+                end
+                %并入社交机器人观点值
+                for i=1:RBsl
+                    ylRB=jihuoRBorder(i);%第i个被激活的社交机器人编号
+                    RBOal=RBOall(ylRB);%提取激活的社交机器人观点值
+                    Oall=[Oall;RBOal];%并入观点值!!!
+                end
+                %% 进行观点交互与演化
+                
+                %% 计算所有一般个体的舆论环境opinion climate
+                for i=1:leng %计算所有个体的舆论环境
+                    iconnected=Carriernetwork(:,i);%取下载体网络第i个节点所在列
+                    ordericonnected=find(iconnected~=0);%提取与节点i相连的节点编号
+                    neighborsopinion=Oall(ordericonnected);%提取节点i的邻居节点观点值
+                    opinionclimate(i)=abs(sum(Oall(i)-neighborsopinion)/length(ordericonnected));%计算自身节点与邻居节点的观点差值和opinion climate
+                    Iit(i)=(2/(1+exp(-2*opinionclimate(i))))-1;%更新节点的opinion climate即舆论环境影响
+                end
+                
+                %% 计算并统计被激活节点
+                actnode=[];
+                jh=rand(leng,1);%随机取0到1的数判断激活
+                jihuopanduan=Iit-jh;%判断激活
+                actnode=find(jihuopanduan>0);%存储被激活节点序号
+                
+                %% 计算被激活节点发生通信的对象
+                comnode=[];%清空被激活节点通信对象
+                actnodeneighber=Carriernetwork(:,actnode);%获取被激活节点的列
+                for i=1:length(actnode)
+                    actnoden=find(actnodeneighber(:,i)~=0);%计算第i个被激活节点的邻居节点位置
+                    actnodennmd=nameda(actnoden);%获取邻居节点的活跃度
+                    leijiahyd=cumsum(actnodennmd);%%活跃度累加
+                    
+                    a=rand(1);%生成随机数
+                    k=a*max(leijiahyd);%生成范围内随机数
+                    
+                    [m,n]=min(abs(leijiahyd-k));% 取相减后的最小值
+                    shuzhi=leijiahyd(n);%%最接近的数
+                    jihuoweizhi=find(leijiahyd==shuzhi);%激活节点产生通信的对象位置编号
+                    jihuoweizhi;
+                    comnode=[comnode;actnoden(jihuoweizhi)];%存储激活节点产生通信的对象序号
+                end
+                
+                %% 确定了激活节点列表actnode及对应的通信对象comnode，现在进行观点评论交互，主要是comnode往adtnode输入语句。
+                corpust=corpus;%使用上时步语料库
+                for i=1:length(actnode)
+                    act=actnode(i);comm=comnode(i);%通信节点对
+                    nameda(act);%获取自身活跃度
+                    plsl=nameda(comm);%获取通信对象活跃度即获取的语句评论数量
+                    plsl=floor(plsl);
+                    language=corpust(comm,:);%获取通信对象语料库
+                    language(language==1001)=[];%抹1001
+                    originyuyan=corpust(act,:);%寻求激活节点语料库
+                    originyuyan(originyuyan==1001)=[];%抹1001
+                    
+                    if  length(originyuyan)+plsl>500%对于超过人类语料库上限的观点进行dropout
+                        dropoutnum=length(originyuyan)+plsl-500;%抛弃的观点数量
+                        originyuyan(1:dropoutnum)=[];%抛弃最早形成的观点
+                    end
+                    
+                    n = plsl;
+                    A = language;
+                    random_num = A(randperm(numel(A),n));
+                    random_num = sort(random_num);%输出通信对象的plsl条评论语句
+                    originyuyan=[originyuyan random_num];%补充进激活节点语料库
+                    
+                    if length(originyuyan)<500
+                        originyuyan=[originyuyan 1001*ones(1,500-length(originyuyan))];%补1001使得维度一致
+                    end
+                    corpus(act,:)=originyuyan;%%激活节点语料库更新
+                end
+                
+                %% 活跃度的霍克斯过程
+                namedat=nameda;%上一时步节点活跃度
+                nameda=nameda*exp(-1);%集体衰减α=1，β=1；
+                
+                hwo=[actnode;comnode];%被激活节点和产生通信的节点
+                hwo=unique(hwo);%留下唯一值
+                namedat(hwo)=namedat(hwo)+1;%被激活节点和产生通信的节点活跃度+1
+                nameda(hwo)=namedat(hwo);%对被激活节点和产生通信的节点活跃度进行置换进全体衰减的活跃度数组中
+                %% 更新节点观点值
+                agreesum=sum(corpus<501,2);%计算持有支持态度的观点评论数量
+                Oall=agreesum./sum(corpus<=1000,2);%初始计算每个体所持有的观点评论数量然后进行每个体的支持率计算
+                
+                %% 从网络中撤掉社交机器人、其语料库、及活跃度
+                Carriernetwork(:,leng+1:leng+RBsl)=[];%撤掉社交机器人
+                Carriernetwork(leng+1:leng+RBsl,:)=[];%撤掉社交机器人
+                corpus(leng+1:leng+RBsl,:)=[];%撤掉语料库
+                nameda(leng+1:leng+RBsl)=[];%撤掉活跃度
+                Oall(leng+1:leng+RBsl)=[];%撤掉观点值
+                
+                %% 判断社交机器人邻居节点观点值与自身观点值的差异 并进行断连重组
+                for i=1:N
+                    RBcom=rubots(:,i);%取出第i个社交机器人的邻居节点编号
+                    chazhi=RBOall(i)-Oall(RBcom);%计算邻居节点观点与预设值差值大小
+                    duanlian=find( chazhi < hol );%判断邻居节点与社交机器人预设观点的差异是否在给定范围内
+                    duanlianxuhao=RBcom(duanlian);%断连节点序号
+                    %length(duanlianxuhao);%断连节点数量
+                    %RBlianjieshuliang(i);%获取i社交机器人的连接记忆数量
+                    newRB=comindexx(RBlianjieshuliang(i)+1:(RBlianjieshuliang(i)+length(duanlianxuhao)));%获取新的度较大的节点序号
+                    
+                    %% 超过搜寻上限的处理方法要补充！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+                    
+                    %%
+                    RBcom(duanlian)=[];%进行断连
+                    RBcom=[RBcom;newRB'];%新加入节点补充
+                    rubots(:,i)=RBcom;%更新邻居节点
+                    RBlianjieshuliang(i)=RBlianjieshuliang(i)+length(duanlianxuhao);%更新社交机器人已连接过的节点数量
+                    
+                end
+                %% 限制活跃度大小
+                nameda(nameda>500)=500;
+            end
+            Oalloo=[Oalloo sum(Oall)/1000];
+        end
+        pjOalloo=[pjOalloo;Oalloo];
+    end
+    pj=sum(pjOalloo)/pjun;
+    sixcuculate=[sixcuculate;pj];
+end
+save('filename')
+
+xname=[1:6];yname=[0:0.01:0.3];%,'\itm','Social bot tolerance'
+h = heatmap(xname,yname,sixcuculate');
+h.CellLabelFormat = '%0.4f';
+%h.CellLabelColor = 'black'
+colormap(gca, 'hot');
+h.XLabel = 'm-parameters of BA scale-free networks (\itm\rm)';
+h.YLabel = 'Social bot tolerance (\itθ\rm)';
+colorbar
+caxis([0.5 1])
