@@ -206,9 +206,7 @@ for qq=1:6%%六个网络切换
                     %length(duanlianxuhao);%断连节点数量
                     %RBlianjieshuliang(i);%获取i社交机器人的连接记忆数量
                     newRB=comindexx(RBlianjieshuliang(i)+1:(RBlianjieshuliang(i)+length(duanlianxuhao)));%获取新的度较大的节点序号
-                    
-                    %% 超过搜寻上限的处理方法要补充！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-                    
+                                       
                     %%
                     RBcom(duanlian)=[];%进行断连
                     RBcom=[RBcom;newRB'];%新加入节点补充
