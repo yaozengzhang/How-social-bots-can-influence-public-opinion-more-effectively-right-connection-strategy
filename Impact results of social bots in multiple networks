@@ -1,4 +1,6 @@
 %% 集成社交机器人和一般个体
+load("carrier network")； %This requires the user to build their own network (sparse matrix)
+%In this example, we have constructed 6 networks：BAcarrier1-6
 pjOalloo=[];
 sixcuculate=[];
 for qq=1:6%%六个网络切换
