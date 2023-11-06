@@ -9,4 +9,8 @@ you shold:
 
 1.run BA_network_1_to_6.mat to load the BA networks data and then run Figure6_six_BA_network_guide_effect.m to get the result of Fig.6
 
+You can get the data result which we use in our work of Fig.6
+
 2.run WS_network_24.mat to load the WS networks data and then run Figure9_WS_network_guide_effect.m to get the result of Fig.9
+
+You can get the data result which we use in our work of Fig.9
