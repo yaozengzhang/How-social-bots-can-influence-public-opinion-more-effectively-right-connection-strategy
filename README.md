@@ -11,7 +11,7 @@ you shold:
 
     You can get the data result which we use in our work of Fig.6
 
-    Figure6_six_BA_network_guide_effect.m has been commented in English to make it easier for readers to understand the program.
+  Figure6_six_BA_network_guide_effect.m has been commented in English to make it easier for readers to understand the program.
 
     The main functionality implemented in this program is the primary model constructed for our work.
 
