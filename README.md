@@ -36,7 +36,7 @@ BA network generation
 -> CSV and heatmap output
 ```
 
-The code keeps the random behavior of the original MATLAB-style script. By default, no random seed is fixed. Use `--seed` only when a deterministic Python run is needed for checking.
+Use `--seed` only when a deterministic Python run is needed for checking.
 
 ## Installation
 
